@@ -17,27 +17,27 @@ import java.lang.reflect.Method;
 @Component
 public class SlugAspect {
 
-    private String slugOrigin(Object entity) {
-        String origin = "_";
-        try {
-            origin = (String)PropertyUtils.getProperty(entity, "name");
-        } catch (Exception e) {
-
-        }
-
+    /**
+     * Find a source from which to generate the slug
+     */
+    private String slugOrigin(Object entity) throws IllegalAccessException {
+        String origin = (String)PropertyUtils.getProperty(entity, "name");
+        
         return origin;
     }
 
-    private void setSlug(Object entity, String slug) {
-        try {
-            PropertyUtils.setProperty(entity, "slug", slug);
-        } catch (Exception e) {
-
-        }
-
+    /**
+     * Set the slug on the entity
+     */
+    private void setSlug(Object entity, String slug) throws IllegalAccessException {
+        PropertyUtils.setProperty(entity, "slug", slug);
+        
         return;
     }
 
+    /**
+     * Find the id of the entity, if it exists (it may not exist if the entity is not persisted yet)
+     */ 
     private Long id(Object entity) {
         Long id;
         try {
@@ -49,7 +49,9 @@ public class SlugAspect {
         return id;
     }
 
-
+    /**
+     * Save slug on CrudRepository.save()
+     */
     @Before("execution(* org.springframework.data.repository.CrudRepository+.save(*))")
     public void adviseRepoSave(JoinPoint joinPoint) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Object entity = joinPoint.getArgs()[0];
